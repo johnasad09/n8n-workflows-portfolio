@@ -1,0 +1,738 @@
+{
+  "name": "asad-Script & Video Generator - asad",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        0
+      ],
+      "id": "92e8983f-a514-4e4a-a666-3ee37758aed3",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "[{\n  \"Caption\": \"Reporter caught in storm 🌪️ #flood #disaster #reporterlife #onlocation #news #viral #explore #breaking #trending #live #updates #alert\",\n  \"Idea\": \"News reporter struggles to stand in heavy winds\", \n  \"Environment\": \"City street flooding, cars half-submerged, reporter holding mic, handheld docu-style.\"\n}]"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        432,
+        240
+      ],
+      "id": "39e1286f-5e3b-4244-9662-6660be125ca9",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4.1-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4.1-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        64,
+        208
+      ],
+      "id": "fc014d5f-36f8-4fe7-aa83-1a031853808f",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "xGHHJB2GUZj1TcSS",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Give me a topic idea about  {{ $json.Topics }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "You are an AI that generates 1 realistic content idea based on a user-provided topic.\\n Your response must be a single-line JSON array and follow the rules below exactly.\\n\\nRULES\\n\\t•\\tAlways return only 1 idea.\\n\\t•\\tInput will be a key topic (e.g., “urban farming,” “arctic survival,” “street food in Vietnam”).\\n\\nThe Idea must:\\n\\t•\\tBe under 13 words.\\n\\t•\\tCapture an interesting, viral-worthy moment, action, or event tied to the topic.\\n\\t•\\tMay be surreal or fictional (not limited to real-world).\\n\\t•\\tMust involve a character.\\n\\nThe Caption must:\\n\\t•\\tBe short, punchy, and viral-friendly.\\n\\t•\\tInclude 1 relevant emoji.\\n\\t•\\tContain exactly 12 hashtags, in this order:\\n\\t•\\t4 topic-relevant hashtags\\n\\t•\\t4 all-time popular hashtags\\n\\t•\\t4 currently trending hashtags (based on live research)\\n\\t•\\tAll hashtags must be lowercase.\\n\\n\\nThe Environment must:\\n\\t•\\tBe under 20 words.\\n\\t•\\tMatch the action in the Idea precisely.\\n\\t•\\tClearly describe:\\n\\t•\\tWhere it happens (rooftop, jungle, alley, frozen lake, etc.)\\n\\t•\\tKey visuals/background (smoke, neon lights, fog, birds, etc.)\\n\\t•\\tMain participants (farmer, cook, mechanic, rescue team, animal, etc.)\\n\\t•\\tScene style (cinematic realism, handheld docu-style, aerial tracking, macro close-up, etc.)\\n\\t•\\tFictional settings are allowed.\\n\\n⸻\\n\\nOUTPUT FORMAT (single line JSON array):\\n\\n[{\\\"Caption\\\": \\\"Short viral title with emoji #4_topic_hashtags #4_all_time_popular_hashtags #4_trending_hashtags\\\", \\\"Idea\\\": \\\"Short idea under 13 words\\\", \\\"Environment\\\": \\\"Brief vivid setting under 20 words matching the action\\\"}]"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        416,
+        0
+      ],
+      "id": "78106c2c-f58c-45e3-9203-4500012dda3d",
+      "name": "Idea Generator"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Generate a prompt based on this idea \"{{ $json.ideas }}\" for google veo3",
+        "options": {
+          "systemMessage": "\\nYou are an AI agent that writes hyper-realistic, cinematic video prompts for Google VEO3. Each prompt should describe a short, vivid selfie-style video clip featuring one unnamed character speaking or acting in a specific moment. The final video should look like found footage or documentary-style film — grounded, realistic, and immersive.\\n\\nREQUIRED STRUCTURE (FILL IN THE BRACKETS BELOW):\\n\\n[Scene paragraph prompt here]\\n\\nMain character: [description of character]\\nThey say: [insert one line of dialogue, fits the scene and mood].\\nThey [describe a physical action or subtle camera movement, e.g. pans the camera, shifts position, glances around].\\nTime of Day: [day / night / dusk / etc.]\\nLens: [describe lens]\\nAudio: (implied) [ambient sounds, e.g. lion growls, wind, distant traffic, birdsong]\\nBackground: [brief restatement of what is visible behind them]\\n\\nRULES FOR PROMPT GENERATION\\n\\nSingle paragraph only, 750–1500 characters. No line breaks or headings.\\n\\nOnly one human character. Never give them a name.\\n\\nInclude one spoken line of dialogue and describe how it’s delivered.\\n\\nCharacter must do something physical, even if subtle (e.g. glance, smirk, pan camera).\\n\\nUse selfie-style framing. Always describe the lens, stock, and camera behavior.\\n\\nScene must feel real and cinematic — like a short clip someone might record on a stylized camera.\\n\\nAlways include the five key technical elements: Time of Day, Lens, Film Stock, Audio, and Background.\\n\\nDO NOT DO THIS:\\n\\nDon’t name the character.\\n\\nDon’t include more than one character. \\n\\nDon't include any special characters.\\n\\nDon’t describe subtitles or on-screen text.\\n\\nDon’t break the paragraph or use formatting.\\n\\nDon’t write vague or abstract scenes — always keep them grounded in physical detail."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        976,
+        0
+      ],
+      "id": "a2472698-248a-481c-9488-18ebb2a1bc67",
+      "name": "prompt generator"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1fV3ryeC8DRIRaAyZxbix2c3okvSZ5x2xP2D0KmuE2Bw",
+          "mode": "list",
+          "cachedResultName": "content gen workshop",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1fV3ryeC8DRIRaAyZxbix2c3okvSZ5x2xP2D0KmuE2Bw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1711364747,
+          "mode": "list",
+          "cachedResultName": "Topics",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1fV3ryeC8DRIRaAyZxbix2c3okvSZ5x2xP2D0KmuE2Bw/edit#gid=1711364747"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "status",
+              "lookupValue": "pending"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        208,
+        0
+      ],
+      "id": "9a72ddc6-63f1-48d6-b20e-ee7658b28f3b",
+      "name": "Fetching Topic prompt",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "EcKS63MP3IoXaq9M",
+          "name": "Google Sheets-johnasad"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1fV3ryeC8DRIRaAyZxbix2c3okvSZ5x2xP2D0KmuE2Bw",
+          "mode": "list",
+          "cachedResultName": "content gen workshop",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1fV3ryeC8DRIRaAyZxbix2c3okvSZ5x2xP2D0KmuE2Bw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1fV3ryeC8DRIRaAyZxbix2c3okvSZ5x2xP2D0KmuE2Bw/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "==ROW()-1",
+            "ideas": "={{ $json.output[0].Idea }}",
+            "captions": "={{ $json.output[0].Caption }}",
+            "prompt": "={{ $json.output[0].Environment }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "ideas",
+              "displayName": "ideas",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "prompt",
+              "displayName": "prompt",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "captions",
+              "displayName": "captions",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "created",
+              "displayName": "created",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        768,
+        0
+      ],
+      "id": "f184e719-cf73-4802-a6d4-734698a1e695",
+      "name": "Output storing",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "EcKS63MP3IoXaq9M",
+          "name": "Google Sheets-johnasad"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8a322194-0fa2-4133-b0ea-297bef0f8799",
+              "name": "PROJECT_ID",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "fa2ef317-fffe-47d1-9881-2a77936884a0",
+              "name": "LOCATION_ID",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "5de91b0e-554c-47e3-9ce2-62235bc6b09f",
+              "name": "API_ENDPOINT",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "04b0cdbf-00ce-44d5-9a7d-19b8a6d28794",
+              "name": "text_prompt",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "7e475d70-45ca-486e-9f54-dc954b7ff361",
+              "name": "ACCESS_TOKEN",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1328,
+        0
+      ],
+      "id": "04859508-e36f-41fc-a705-e487f56002bf",
+      "name": "structure data"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "sdfs.com",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {}
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1536,
+        0
+      ],
+      "id": "eb60ae5d-c8b6-446c-a558-e85993bb9273",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1744,
+        0
+      ],
+      "id": "22bdf811-d5a2-4808-aa2a-657394e05d83",
+      "name": "Wait",
+      "webhookId": "78152be0-b462-4dee-9335-b51ee9a05b3c"
+    },
+    {
+      "parameters": {
+        "url": "a.com",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1952,
+        0
+      ],
+      "id": "3752c687-1ec1-4148-94a3-734dbbba5568",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "operation": "toBinary",
+        "sourceProperty": "skfdjlsaf",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        2160,
+        0
+      ],
+      "id": "2df39ca4-8a47-4a4f-ba82-cc855981cac9",
+      "name": "Convert to File"
+    },
+    {
+      "parameters": {
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "root",
+          "cachedResultName": "/ (Root folder)"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        2368,
+        0
+      ],
+      "id": "129f810b-930b-4cc1-81fd-fee29db02370",
+      "name": "Upload file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "Hn3alpLoO43jJe6b",
+          "name": "Google Drive account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1fV3ryeC8DRIRaAyZxbix2c3okvSZ5x2xP2D0KmuE2Bw",
+          "mode": "list",
+          "cachedResultName": "content gen workshop",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1fV3ryeC8DRIRaAyZxbix2c3okvSZ5x2xP2D0KmuE2Bw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1fV3ryeC8DRIRaAyZxbix2c3okvSZ5x2xP2D0KmuE2Bw/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "created": "created"
+          },
+          "matchingColumns": [
+            "ideas"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "ideas",
+              "displayName": "ideas",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "prompt",
+              "displayName": "prompt",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "captions",
+              "displayName": "captions",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "created",
+              "displayName": "created",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        2784,
+        0
+      ],
+      "id": "9c9ed927-2322-4dbb-b67c-a962a365d27b",
+      "name": "Update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "EcKS63MP3IoXaq9M",
+          "name": "Google Sheets-johnasad"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "video",
+        "operation": "upload",
+        "title": "asd",
+        "regionCode": "PK",
+        "categoryId": "18",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.youTube",
+      "typeVersion": 1,
+      "position": [
+        2992,
+        0
+      ],
+      "id": "1b8fe474-10fc-4042-8f5c-ae8c6bca58bc",
+      "name": "Upload a video",
+      "credentials": {
+        "youTubeOAuth2Api": {
+          "id": "yiuEDAceOehJcjby",
+          "name": "YouTube account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "resource": "file",
+        "operation": "share",
+        "fileId": {
+          "__rl": true,
+          "value": "1be1xbsJikYYUuUGhmQnjDjD2Cxc0DFOa",
+          "mode": "list",
+          "cachedResultName": " Transformation.mp4",
+          "cachedResultUrl": "https://drive.google.com/file/d/1be1xbsJikYYUuUGhmQnjDjD2Cxc0DFOa/view?usp=drivesdk"
+        },
+        "permissionsUi": {},
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        2576,
+        0
+      ],
+      "id": "a97353e5-0e57-4755-a130-eb90ca8985f1",
+      "name": "Share file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "Hn3alpLoO43jJe6b",
+          "name": "Google Drive account 2"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Fetching Topic prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Idea Generator",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Idea Generator",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "prompt generator",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Idea Generator": {
+      "main": [
+        [
+          {
+            "node": "Output storing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "prompt generator": {
+      "main": [
+        [
+          {
+            "node": "structure data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetching Topic prompt": {
+      "main": [
+        [
+          {
+            "node": "Idea Generator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Output storing": {
+      "main": [
+        [
+          {
+            "node": "prompt generator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "structure data": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File": {
+      "main": [
+        [
+          {
+            "node": "Upload file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload file": {
+      "main": [
+        [
+          {
+            "node": "Share file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Upload a video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Share file": {
+      "main": [
+        [
+          {
+            "node": "Update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload a video": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "ea99ce60-5230-4965-9ff4-330cfb1e2aa6",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "52f60d2d2b29968fc780bac4d694e490d741259297550ce2e62dc28e57bc5aff"
+  },
+  "id": "5d6nBDIj0m-6sTa_vWdFu",
+  "tags": []
+}
