@@ -1,0 +1,397 @@
+{
+  "name": "asad-Facebook Lead Qualifier Agent",
+  "nodes": [
+    {
+      "parameters": {
+        "multipleMethods": true,
+        "path": "fb-comment",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        96
+      ],
+      "id": "5783c772-76c5-4296-9e06-74105fc1bf40",
+      "name": "Webhook",
+      "webhookId": "a1e8f41c-d6fb-4971-8019-62dd74330bf9"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "={{ $json.query['hub.challenge'] }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        224,
+        0
+      ],
+      "id": "a8f4c8a8-cc77-4b63-a434-9d4ab850d80b",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        448,
+        288
+      ],
+      "id": "4cfb96b1-ef24-486f-ac4c-c49988c10b19",
+      "name": "No Operation, do nothing"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4.1-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4.1-MINI"
+        },
+        "responses": {
+          "values": [
+            {
+              "role": "system",
+              "content": "=You are a Facebook comment analyzer and response generator for Charsadwaly (Peshawari Chappal) business.\n\nBUSINESS CONTEXT:\nBusiness Name: Charsadwaly\nIndustry: Peshawari Chappal\nServices: Kaptaan Chappal, Zardari Chappal, Peshawari Chappal, Peshawar Zalmi Chappal\nTarget Audience: People looking for Peshawari Chappal\nTone: Friendly, professional, warm, helpful\nSpecialties: New Designs, Ready to wear, High Quality, Hand Stitched\n\nRESPONSE RULES:\n- Reply to ALL comments EXCEPT negative sentiment comments\n- For negative comments: analyze but DO NOT generate reply (manager will handle)\n- Always be warm, helpful, and professional\n- Include relevant business information when appropriate\n- Use conversational, friendly tone\n- Keep replies concise but engaging\n\nAnalyze the comment and return ONLY this JSON structure:\n\n{\n  \"original_comment\": \"{{ $json.comment_text }}\",\n  \"user_name\": \"{{ $json.lead_name }}\",\n  \"sentiment\": \"positive|negative|neutral\",\n  \"category\": \"lead|generic_question|complaint|spam|compliment|greeting|inquiry\",\n  \"lead_quality\": \"high|medium|low|none\",\n  \"priority\": \"high|medium|low\",\n  \"requires_reply\": true|false,\n  \"generated_reply\": \"your reply text or null if no reply needed\",\n  \"requires_manager_alert\": true|false,\n  \"alert_type\": \"negative_comment|high_priority_lead|medium_priority_lead|none\",\n  \"analysis_notes\": \"brief explanation of categorization\"\n}\n\nCLASSIFICATION RULES:\n- LEAD: Comments about products, services, pricing, ordering, availability\n- HIGH QUALITY LEAD: Ready to purchase, asking for quotes, specific needs\n- MEDIUM QUALITY LEAD: Comparing options, planning ahead, general interest\n- LOW QUALITY LEAD: Casual interest, browsing, vague inquiries\n- NEGATIVE: Complaints, problems, dissatisfaction, criticism\n- GREETING: Simple hellos, thanks, congratulations\n- INQUIRY: General questions about business, hours, location\n\nMANAGER ALERTS:\n- Negative sentiment → alert_type: \"negative_comment\"\n- High priority leads → alert_type: \"high_priority_lead\"\n- Medium priority leads → alert_type: \"medium_priority_lead\"\n\nREPLY EXAMPLES:\n- Greeting: \"Hi [name]! Thanks for stopping by! 🌸 How can we help make your day more beautiful?\"\n- Lead: \"Hi [name]! We'd love to help you with [their need]. Please message us or call [91000000000] for a custom quote!\"\n- Generic question: \"Hi [name]! [answer their question]. Feel free to reach out if you need anything else!\"\n- Compliment: \"Thank you so much [name]! We're happy you love our work! 🌺\"\n\nComment to analyze: \"{{ $json.comment_text }}\"\nUser: {{ $json.lead_name }}\""
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {
+          "textFormat": {
+            "textOptions": {
+              "type": "json_object"
+            }
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.1,
+      "position": [
+        672,
+        96
+      ],
+      "id": "1ca895d7-0cf6-426c-b73e-61b65ca65706",
+      "name": "Message a model",
+      "credentials": {
+        "openAiApi": {
+          "id": "xGHHJB2GUZj1TcSS",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ad981df8-7147-4e91-bee3-cc41a4d88fd1",
+              "name": "comment_text",
+              "value": "={{ $json.body.entry[0].changes[0].value.message }}",
+              "type": "string"
+            },
+            {
+              "id": "23535719-1de7-40a6-b345-ed53f83c3719",
+              "name": "lead_name",
+              "value": "={{ $json.body.entry[0].changes[0].value.from.name }}",
+              "type": "string"
+            },
+            {
+              "id": "9880f4a5-de6a-47d4-b84c-3be8e5e8570e",
+              "name": "comment_id",
+              "value": "={{ $json.body.entry[0].changes[0].value.comment_id }}",
+              "type": "string"
+            },
+            {
+              "id": "0118a541-5702-454c-8f33-e19854765752",
+              "name": "post_id",
+              "value": "={{ $json.body.entry[0].changes[0].value.post_id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        448,
+        96
+      ],
+      "id": "e5ff4bf1-856c-4add-b1f8-4922e67cc7db",
+      "name": "Structure data"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "0c3999b6-f676-48e9-94a4-91c5f4eb9a0c",
+              "leftValue": "{{$json.output[0].content[0].text.alert_type}}",
+              "rightValue": "negative_comment",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            },
+            {
+              "id": "06162b43-f327-42df-8eb7-d3010536e5e5",
+              "leftValue": "={{$json.output[0].content[0].text.requires_reply}}",
+              "rightValue": "true",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1024,
+        96
+      ],
+      "id": "5b7a5453-409e-4261-9c21-ba762424d859",
+      "name": "auto respond?"
+    },
+    {
+      "parameters": {
+        "sendTo": "johnasad09@gmail.com",
+        "subject": "good ",
+        "message": "good",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1248,
+        96
+      ],
+      "id": "262894a1-1424-42ca-8a5b-fde4bc3b4e56",
+      "name": "Send a message for follow up",
+      "webhookId": "96db1d7d-cf73-4876-bab6-114c42954d4f",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "9N31K95FtfC5IwJl",
+          "name": "Gmail account-johnasad"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "johnasad09@gmail.com",
+        "subject": "Negative Comment",
+        "message": "NEgative comment",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1248,
+        288
+      ],
+      "id": "7ff5be29-9f5a-4836-975f-9aaf47b3928f",
+      "name": "Send a message incase of negative comment",
+      "webhookId": "509bdcb0-0a4e-495e-8eff-3f1081c2fb65",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "9N31K95FtfC5IwJl",
+          "name": "Gmail account-johnasad"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.facebook.com/v25.0/{{ $('Structure data').item.json.comment_id }}/comments",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "access_token",
+              "value": "EAANAiNhDAXABQxhIgkmVGTKxh185LPlGxZBZCzZCRMZAedOr6rJgWA9dp1qiUdXbOZC3E2XoHHu3ZB7hKW0Q62HQl40eMLQjblAzM0ZCKpczFGte3vfpQRTiTmBLHyidC5Fxbq3tCC69Flfho8MJ8xGD7WD13mSmFf0OqVa9oEYJGhAxBV3kLBQmNh6KY3Rbab9yV4ZD"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"message\": \"{{$('Message a model').item.json.output[0].content[0].text.generated_reply}}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1248,
+        -96
+      ],
+      "id": "11e8fca0-36cc-42ca-b0b9-5ba826f0f5b5",
+      "name": "Reply back"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "d542f4b2-db33-441c-95ed-a3f63c890d77",
+              "leftValue": "={{ $json.body.entry[0].changes[0].value.item }}",
+              "rightValue": "comment",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "2a907411-99a4-46cf-8548-729b9ef14ff1",
+              "leftValue": "={{ $json.body.entry[0].changes[0].value.verb }}",
+              "rightValue": "add",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            },
+            {
+              "id": "fe3a79a5-4e5c-41b9-a9a1-ea7ec9a99b91",
+              "leftValue": "={{ $json.body.entry[0].changes[0].value.from.id }}",
+              "rightValue": 112698025004502,
+              "operator": {
+                "type": "number",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        224,
+        192
+      ],
+      "id": "d2c32208-fc7a-4653-914e-327863b26499",
+      "name": "if"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "if",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structure data": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "auto respond?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "auto respond?": {
+      "main": [
+        [
+          {
+            "node": "Reply back",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send a message for follow up",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a message incase of negative comment",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "if": {
+      "main": [
+        [
+          {
+            "node": "Structure data",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "db6df55f-ed5f-42ad-bedb-c7a152fb4a8f",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "52f60d2d2b29968fc780bac4d694e490d741259297550ce2e62dc28e57bc5aff"
+  },
+  "id": "VMz59xfqsphixMDpIjFtM",
+  "tags": []
+}
