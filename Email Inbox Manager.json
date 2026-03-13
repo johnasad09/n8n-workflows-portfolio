@@ -1,0 +1,718 @@
+{
+  "name": "Asad - Inbox Manager",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "simple": false,
+        "filters": {},
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        1296,
+        1552
+      ],
+      "id": "77b2aec3-8664-42ed-bfce-e9d16ae309e0",
+      "name": "Gmail Trigger",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "9N31K95FtfC5IwJl",
+          "name": "Gmail account-johnasad"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "inputText": "=Subject:  {{ $json.subject }}\nEmail body: {{ $json.text }}\nSender Email: {{ $json.from.value[0].address }}",
+        "categories": {
+          "categories": [
+            {
+              "category": "Priority",
+              "description": "=Classify any message as Priority where the sender's email or name contains: - khannaeem1802@gmail.com - khantariq0811@gmail.com\n\nClassify any message as Priority where the subject or the email requires any action to be taken from my side.\n\nClassify it as Priority if it seems important."
+            },
+            {
+              "category": "Newsletter",
+              "description": "=Classify any message as Newsletter where the sender's name or email matches any of the following:-newsletter@jamiebrindle.io- nick+news@leftclick.ai- ryan@ryanandmattdatascience.com - thebatch@deeplearning.ai - hello@ship30for30.com - menno.gottmer@adaptiveteams.teamtailor-mail.com - balobo@xwf.google.com - emilia.vicini@adaptiveteams.teamtailor-mail.com - pablos@deepfuture.tech -urduaiorg@mail.beehiiv.com - marcom@riverside.fm - tim@fourhourbody.com\n\nClassify any message as Newsletter where the Subject contains the word \"Newsletter\"\n\nClassify any message as Newsletter where you think it is a Newsletter"
+            },
+            {
+              "category": "Notifications",
+              "description": "=Classify any message as Notifications where the sender's name or email contains: - noreply@skool.com - jobalerts-noreply@linkedin.com - invitations@linkedin.com - noreply@corticallabs.com - no-reply@canva.com |Classify any message as Notifications where the subject contains notifications."
+            },
+            {
+              "category": "Simon Squibb",
+              "description": "Classify any message as Simon Squibb where the sender's email contains: - simonsquibb@simonsquibb.com"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.textClassifier",
+      "typeVersion": 1.1,
+      "position": [
+        1520,
+        1552
+      ],
+      "id": "b4c9c757-185c-45c8-91c0-860794a83799",
+      "name": "Text Classifier"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1600,
+        1840
+      ],
+      "id": "53a7471d-a6ac-4da0-b61e-1a803599ebb0",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "bO1DO2BTjwyiiLYc",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $json.id }}",
+        "labelIds": [
+          "Label_5019652547823766482"
+        ]
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1872,
+        1456
+      ],
+      "id": "9e4c3a00-f733-422d-9138-38be725d4af2",
+      "name": "Newsletter",
+      "webhookId": "082a9360-59cc-4f16-af33-5c4c29a43426",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "9N31K95FtfC5IwJl",
+          "name": "Gmail account-johnasad"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $json.id }}",
+        "labelIds": [
+          "Label_5019652547823766482"
+        ]
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1872,
+        1264
+      ],
+      "id": "b016bb80-4aba-4f63-b942-65306cacba6e",
+      "name": "Priority",
+      "webhookId": "082a9360-59cc-4f16-af33-5c4c29a43426",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "9N31K95FtfC5IwJl",
+          "name": "Gmail account-johnasad"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $json.id }}",
+        "labelIds": [
+          "Label_1632405097876261715"
+        ]
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1872,
+        1648
+      ],
+      "id": "4fe30bca-93ff-4709-aa02-1e1953e1500b",
+      "name": "Notifications",
+      "webhookId": "082a9360-59cc-4f16-af33-5c4c29a43426",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "9N31K95FtfC5IwJl",
+          "name": "Gmail account-johnasad"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $json.id }}",
+        "labelIds": [
+          "Label_768873483437330948"
+        ]
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1872,
+        1840
+      ],
+      "id": "0d9cd2f4-2a5b-4fbc-9155-d22160f38f59",
+      "name": "Simon Squibb",
+      "webhookId": "082a9360-59cc-4f16-af33-5c4c29a43426",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "9N31K95FtfC5IwJl",
+          "name": "Gmail account-johnasad"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "removeLabels",
+        "messageId": "={{ $json.id }}",
+        "labelIds": [
+          "INBOX"
+        ]
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        2096,
+        1648
+      ],
+      "id": "afbd4d8c-5900-4e2d-820b-4ca68d7e6522",
+      "name": "Remove label INBOX from message",
+      "webhookId": "590ac2cb-216e-4e78-84fe-1b080e0acef9",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "9N31K95FtfC5IwJl",
+          "name": "Gmail account-johnasad"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "inputText": "=Subject: {{ $json.headers.subject }}\nEmail body: {{ $json.text }}\nSender Email: {{ $json.from.text }}",
+        "categories": {
+          "categories": [
+            {
+              "category": "Priority",
+              "description": "=Classify any message as Priority where the sender's email or name contains: - khannaeem1802@gmail.com - khantariq0811@gmail.com\n\nClassify any message as Priority where the subject or the email requires any action to be taken from my side.\n\nClassify it as Priority if it seems important."
+            },
+            {
+              "category": "Newsletter",
+              "description": "Classify any message as Newsletter where the sender's name or email matches any of the following:-newsletter@jamiebrindle.io- nick+news@leftclick.ai- ryan@ryanandmattdatascience.com - thebatch@deeplearning.ai - hello@ship30for30.com - menno.gottmer@adaptiveteams.teamtailor-mail.com - balobo@xwf.google.com - emilia.vicini@adaptiveteams.teamtailor-mail.com - pablos@deepfuture.tech -urduaiorg@mail.beehiiv.com|Classify any message as Newsletter where the Subject contains the word \"Newsletter\"| Classify any message as Newsletter where you think it is a Newsletter"
+            },
+            {
+              "category": "Notifications",
+              "description": "Classify any message as Notifications where the sender's name or email contains: - noreply@skool.com - jobalerts-noreply@linkedin.com - invitations@linkedin.com - noreply@corticallabs.com - no-reply@canva.com  |Classify any message as Notifications where the subject contains notifications."
+            },
+            {
+              "category": "Simon Squibb",
+              "description": "Classify any message as Simon Squibb where the sender's email contains: - simonsquibb@simonsquibb.com"
+            }
+          ]
+        },
+        "options": {
+          "enableAutoFixing": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.textClassifier",
+      "typeVersion": 1.1,
+      "position": [
+        3184,
+        1488
+      ],
+      "id": "ea693427-e126-42f4-b73d-9e0326393c39",
+      "name": "Text Classifier1"
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $json.id }}",
+        "labelIds": [
+          "Label_5019652547823766482"
+        ]
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        3536,
+        1392
+      ],
+      "id": "aa153d1c-cf59-485e-a6fc-eb3a31fbb650",
+      "name": "Newsletter1",
+      "webhookId": "082a9360-59cc-4f16-af33-5c4c29a43426",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "9N31K95FtfC5IwJl",
+          "name": "Gmail account-johnasad"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $json.id }}",
+        "labelIds": [
+          "Label_5019652547823766482"
+        ]
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        3536,
+        1200
+      ],
+      "id": "6d97f6b2-097b-4d1b-9d9c-5c07af467b3e",
+      "name": "Priority1",
+      "webhookId": "082a9360-59cc-4f16-af33-5c4c29a43426",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "9N31K95FtfC5IwJl",
+          "name": "Gmail account-johnasad"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $json.id }}",
+        "labelIds": [
+          "Label_1632405097876261715"
+        ]
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        3536,
+        1584
+      ],
+      "id": "102bc8dd-46c7-4c66-a8e5-992e9635bbe5",
+      "name": "Notifications1",
+      "webhookId": "082a9360-59cc-4f16-af33-5c4c29a43426",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "9N31K95FtfC5IwJl",
+          "name": "Gmail account-johnasad"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $json.id }}",
+        "labelIds": [
+          "Label_768873483437330948"
+        ]
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        3536,
+        1776
+      ],
+      "id": "95d91882-4a3b-40e2-b3dd-256ec2bd7e5c",
+      "name": "Simon Squibb1",
+      "webhookId": "082a9360-59cc-4f16-af33-5c4c29a43426",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "9N31K95FtfC5IwJl",
+          "name": "Gmail account-johnasad"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "removeLabels",
+        "messageId": "={{ $json.id }}",
+        "labelIds": [
+          "INBOX"
+        ]
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        3760,
+        1392
+      ],
+      "id": "bbefc2c1-dcb4-40df-920e-465fc5935e07",
+      "name": "Remove label INBOX from message1",
+      "webhookId": "590ac2cb-216e-4e78-84fe-1b080e0acef9",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "9N31K95FtfC5IwJl",
+          "name": "Gmail account-johnasad"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "simple": false,
+        "filters": {},
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        2960,
+        1488
+      ],
+      "id": "5f63d657-2030-492c-b9dd-e84cc67ff0ee",
+      "name": "Get many messages",
+      "webhookId": "8124cae6-9ae2-44a1-9b4e-d25f7f32115d",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "9N31K95FtfC5IwJl",
+          "name": "Gmail account-johnasad"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        2736,
+        1488
+      ],
+      "id": "1538008f-18a7-4246-806d-8a81c606ba58",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        3248,
+        1776
+      ],
+      "id": "522c0048-2515-410e-beb2-2a28065b41b6",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "xGHHJB2GUZj1TcSS",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "removeLabels",
+        "messageId": "={{ $json.id }}",
+        "labelIds": [
+          "INBOX"
+        ]
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        3760,
+        1776
+      ],
+      "id": "d165c7c4-8228-42f8-b502-49ea568d7307",
+      "name": "Remove label INBOX from message2",
+      "webhookId": "590ac2cb-216e-4e78-84fe-1b080e0acef9",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "9N31K95FtfC5IwJl",
+          "name": "Gmail account-johnasad"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "removeLabels",
+        "messageId": "={{ $json.id }}",
+        "labelIds": [
+          "INBOX"
+        ]
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        3760,
+        1584
+      ],
+      "id": "bddd1131-0d2f-4624-b722-f1fd39bbb5a2",
+      "name": "Remove label INBOX from message3",
+      "webhookId": "590ac2cb-216e-4e78-84fe-1b080e0acef9",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "9N31K95FtfC5IwJl",
+          "name": "Gmail account-johnasad"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Auto categorize emails\n",
+        "height": 816,
+        "width": 1376,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2672,
+        1184
+      ],
+      "id": "987179ff-b30a-4f08-8b5b-ac58c7282db7",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Auto categorize new emails\n",
+        "height": 816,
+        "width": 1376,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1232,
+        1184
+      ],
+      "id": "aa88f966-6da5-4146-bacc-d5e8d7be7049",
+      "name": "Sticky Note1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "Text Classifier",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Text Classifier",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Text Classifier": {
+      "main": [
+        [
+          {
+            "node": "Priority",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Newsletter",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Notifications",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Simon Squibb",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Newsletter": {
+      "main": [
+        [
+          {
+            "node": "Remove label INBOX from message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notifications": {
+      "main": [
+        [
+          {
+            "node": "Remove label INBOX from message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simon Squibb": {
+      "main": [
+        [
+          {
+            "node": "Remove label INBOX from message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Text Classifier1": {
+      "main": [
+        [
+          {
+            "node": "Priority1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Newsletter1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Notifications1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Simon Squibb1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Newsletter1": {
+      "main": [
+        [
+          {
+            "node": "Remove label INBOX from message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notifications1": {
+      "main": [
+        [
+          {
+            "node": "Remove label INBOX from message3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simon Squibb1": {
+      "main": [
+        [
+          {
+            "node": "Remove label INBOX from message2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Get many messages",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many messages": {
+      "main": [
+        [
+          {
+            "node": "Text Classifier1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Text Classifier1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Remove label INBOX from message1": {
+      "main": [
+        []
+      ]
+    },
+    "Remove label INBOX from message3": {
+      "main": [
+        []
+      ]
+    },
+    "Remove label INBOX from message2": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "10c7dc01-560c-418c-a0ee-2e0672c9e825",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "52f60d2d2b29968fc780bac4d694e490d741259297550ce2e62dc28e57bc5aff"
+  },
+  "id": "BzAA7oHRLwjm01x0e0Y3r",
+  "tags": []
+}
