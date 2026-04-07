@@ -1,0 +1,429 @@
+{
+  "name": "Lead Gen via Apify GMap Scrapper",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Lead Gen",
+        "formDescription": "Generate leads from Google Maps",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Search Business",
+              "placeholder": "Dentist / Restaurant etc.",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Location",
+              "placeholder": "New York, USA",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "No. of Leads",
+              "fieldType": "number",
+              "placeholder": "5",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.5,
+      "position": [
+        0,
+        0
+      ],
+      "id": "5cc22647-4f3e-4b86-a6c2-38ca8043e9ee",
+      "name": "On form submission",
+      "webhookId": "0f8d790e-ba24-4fce-9411-1af5fac9c770"
+    },
+    {
+      "parameters": {
+        "actorSource": "store",
+        "actorId": {
+          "__rl": true,
+          "value": "https://console.apify.com/actors/nwua9Gu5YrADL7ZDj/input",
+          "mode": "url"
+        },
+        "customBody": "={\n    \"includeWebResults\": false,\n    \"language\": \"en\",\n    \"locationQuery\": \"{{ $json.Location }}\",\n    \"maxCrawledPlacesPerSearch\": {{ $json['No. of Leads'] }},\n    \"maximumLeadsEnrichmentRecords\": 0,\n    \"scrapeContacts\": false,\n    \"scrapeDirectories\": false,\n    \"scrapeImageAuthors\": false,\n    \"scrapePlaceDetailPage\": false,\n    \"scrapeReviewsPersonalData\": true,\n    \"scrapeSocialMediaProfiles\": {\n        \"facebooks\": false,\n        \"instagrams\": false,\n        \"tiktoks\": false,\n        \"twitters\": false,\n        \"youtubes\": false\n    },\n    \"scrapeTableReservationProvider\": false,\n    \"searchStringsArray\": [\n        \"{{ $json['Search Business'] }}\"\n    ],\n    \"skipClosedPlaces\": false\n} "
+      },
+      "type": "@apify/n8n-nodes-apify.apify",
+      "typeVersion": 1,
+      "position": [
+        208,
+        0
+      ],
+      "id": "005a89c2-7cac-4d8b-9ab2-08644fa9e6ed",
+      "name": "Run an Actor",
+      "credentials": {
+        "apifyApi": {
+          "id": "kzBDwoo2N7g3bZ8f",
+          "name": "Apify account-naeem"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "Datasets",
+        "datasetId": "={{ $json.defaultDatasetId }}",
+        "limit": null
+      },
+      "type": "@apify/n8n-nodes-apify.apify",
+      "typeVersion": 1,
+      "position": [
+        416,
+        0
+      ],
+      "id": "5d2b58f8-bea8-4bbc-b0f0-b1097b20b9d6",
+      "name": "Get dataset items",
+      "credentials": {
+        "apifyApi": {
+          "id": "haJjuw1jeJQe5PgS",
+          "name": "Apify account-johnasad"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "8be039e6-5c74-4afa-9078-4764def28393",
+              "leftValue": "={{ $json.permanentlyClosed }}",
+              "rightValue": false,
+              "operator": {
+                "type": "boolean",
+                "operation": "false",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "8485e312-d899-435e-b9f8-6279c4e5b10b",
+              "leftValue": "={{ $json.temporarilyClosed }}",
+              "rightValue": false,
+              "operator": {
+                "type": "boolean",
+                "operation": "false",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.3,
+      "position": [
+        624,
+        0
+      ],
+      "id": "13fecad0-7559-445f-aae8-8fe196d0adc3",
+      "name": "Filter"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "58f85004-7cde-490e-a5be-039ab14b10f5",
+              "name": "business-name",
+              "value": "={{ $json.title }}",
+              "type": "string"
+            },
+            {
+              "id": "d14a617a-9fef-4f6d-845d-d1a6541fe8ac",
+              "name": "category",
+              "value": "={{ $json.categoryName }}",
+              "type": "string"
+            },
+            {
+              "id": "5083e806-d150-4826-ba70-70c2978f5a8b",
+              "name": "address",
+              "value": "={{ $json.address }}",
+              "type": "string"
+            },
+            {
+              "id": "c888e853-dc50-45be-b433-b7b1cca94a99",
+              "name": "city",
+              "value": "={{ $json.city }}",
+              "type": "string"
+            },
+            {
+              "id": "01959297-a997-4cee-88f1-bd0d3f5642da",
+              "name": "country",
+              "value": "={{ $json.countryCode }}",
+              "type": "string"
+            },
+            {
+              "id": "b0677dc0-efc0-46d1-8e5a-93ff761ebe26",
+              "name": "phone",
+              "value": "={{ $json.phoneUnformatted }}",
+              "type": "string"
+            },
+            {
+              "id": "fd445d75-73eb-4029-a4d8-f31ee5242c65",
+              "name": "website",
+              "value": "={{ $json.website }}",
+              "type": "string"
+            },
+            {
+              "id": "2938d880-0423-4977-b642-2a59d5bd8222",
+              "name": "reviewsCount",
+              "value": "={{ $json.reviewsCount }}",
+              "type": "number"
+            },
+            {
+              "id": "5080be0d-d16d-49bb-a02d-809f04bd678f",
+              "name": "imagesCount",
+              "value": "={{ $json.imagesCount }}",
+              "type": "number"
+            },
+            {
+              "id": "04b89ba6-ba0c-4fe7-a58f-a257061fac27",
+              "name": "state",
+              "value": "={{ $json.state }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        832,
+        0
+      ],
+      "id": "83faf722-a052-47e3-bc49-dbb1eca507fa",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1kbuw696m2sBmNCUXG-zX-xBCI8rJdPXeRqn2eFkNuCY",
+          "mode": "list",
+          "cachedResultName": "Google Map Generated Leads via APIFY",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1kbuw696m2sBmNCUXG-zX-xBCI8rJdPXeRqn2eFkNuCY/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1kbuw696m2sBmNCUXG-zX-xBCI8rJdPXeRqn2eFkNuCY/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Category": "={{ $json.category }}",
+            "Name": "={{ $json['business-name'] }}",
+            "Address": "={{ $json.address }}",
+            "City": "={{ $json.city }}",
+            "Country": "={{ $json.country }}",
+            "Phone": "={{ $json.phone }}",
+            "Website": "={{ $json.website }}",
+            "Reviews Count": "={{ $json.reviewsCount }}",
+            "Image Count": "={{ $json.imagesCount }}",
+            "State": "={{ $json.state }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Category",
+              "displayName": "Category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Address",
+              "displayName": "Address",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "City",
+              "displayName": "City",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "State",
+              "displayName": "State",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Country",
+              "displayName": "Country",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Phone",
+              "displayName": "Phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Website",
+              "displayName": "Website",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Reviews Count",
+              "displayName": "Reviews Count",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Image Count",
+              "displayName": "Image Count",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "cellFormat": "RAW"
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1040,
+        0
+      ],
+      "id": "5cce74ae-3f29-4745-b652-166fe357da0f",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "WlyEqjRq1fRtODeP",
+          "name": "SOMS Media"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Run an Actor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run an Actor": {
+      "main": [
+        [
+          {
+            "node": "Get dataset items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get dataset items": {
+      "main": [
+        [
+          {
+            "node": "Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "899f0a0a-1745-497d-b99c-a1aee8637932",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "52f60d2d2b29968fc780bac4d694e490d741259297550ce2e62dc28e57bc5aff"
+  },
+  "id": "CyJQm04Hd5BxuxaIjGung",
+  "tags": []
+}
