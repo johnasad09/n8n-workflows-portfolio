@@ -1,0 +1,227 @@
+{
+  "name": "AI Task Extractor",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -936,
+        192
+      ],
+      "id": "1f30ee04-b260-42eb-948a-3ceb7a39cd9d",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "HH7tvI1NLdBPgmfH",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "simple": false,
+        "filters": {},
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -1232,
+        -32
+      ],
+      "id": "90d0ee4a-109a-4cd3-b95d-abfae1209206",
+      "name": "Trigger: New Email",
+      "alwaysOutputData": false,
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "LyWG62rvj8nPrvaQ",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Extract **all tasks** mentioned in this email. \nFor each task, return a JSON object with:\n- task\n- duration\n- priority\n- end_date\nLeave any missing fields empty. \nEven if the tasks are written naturally in sentences, detect every separate task.\nEmail: {{ $json.text }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -1008,
+        -32
+      ],
+      "id": "c267f34e-d604-4936-bfcb-53a08e86e5ad",
+      "name": "AI: Extract Tasks"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Access the incoming items\nconst items = $input.all(); // this gets all incoming items\n\nconst results = items.map(item => {\n    let aiOutput = item.json.output; // get the AI output\n\n    // Remove ```json ``` wrapper\n    aiOutput = aiOutput.replace(/```json|```/g, '').trim();\n\n    // Parse JSON\n    let tasks = [];\n    try {\n        tasks = JSON.parse(aiOutput);\n    } catch (error) {\n        console.log(\"Error parsing AI output:\", error);\n    }\n\n    // Return each task as a separate item\n    return tasks.map(t => ({ json: t }));\n});\n\n// Flatten the array because each map returns an array\nreturn results.flat();\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -656,
+        -32
+      ],
+      "id": "87401b06-c12e-4036-8949-7aaaac23219d",
+      "name": "Parse AI Output"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1IrwO-Fn-Ur5EW_JiNz97DbO80-nzFFosQ6N1KgtJ1k4",
+          "mode": "list",
+          "cachedResultName": "n8n to do list",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1IrwO-Fn-Ur5EW_JiNz97DbO80-nzFFosQ6N1KgtJ1k4/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1IrwO-Fn-Ur5EW_JiNz97DbO80-nzFFosQ6N1KgtJ1k4/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Task": "={{ $json.task }}",
+            "Duration": "={{ $json.duration }}",
+            "Priority": "={{ $json.priority }}",
+            "End date": "={{ $json.end_date }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Task",
+              "displayName": "Task",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Duration",
+              "displayName": "Duration",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Priority",
+              "displayName": "Priority",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "End date",
+              "displayName": "End date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -432,
+        -32
+      ],
+      "id": "6ec409cb-7924-41e6-9934-d433f686dfcc",
+      "name": "Store Tasks in Sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "pjk4v3BylcPYDh53",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI: Extract Tasks",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Trigger: New Email": {
+      "main": [
+        [
+          {
+            "node": "AI: Extract Tasks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI: Extract Tasks": {
+      "main": [
+        [
+          {
+            "node": "Parse AI Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse AI Output": {
+      "main": [
+        [
+          {
+            "node": "Store Tasks in Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "13d5a075-7cee-4ca5-bfc1-9d5f8eb3fa75",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "05b5c4453de2f1c95982a7975f249bef06096e109ff688605938daf872603eb4"
+  },
+  "id": "t5vGNJD90LZiF1IB",
+  "tags": []
+}
