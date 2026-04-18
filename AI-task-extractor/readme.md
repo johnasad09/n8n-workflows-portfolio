@@ -5,7 +5,7 @@ Managing a busy inbox often feels like a full-time job. This project introduces 
 It is designed to turn unstructured natural language into actionable data, ensuring no deadline or request slips through the cracks.
 
 ---
-<img width="1163" height="537" alt="image" src="https://github.com/user-attachments/assets/c9b90b16-ab76-4ede-acb0-ee01a8f7bafa" />
+!(AI-task-extractor/AI Task Extractor.png)
 
 ---
 
