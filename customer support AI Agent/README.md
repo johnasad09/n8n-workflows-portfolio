@@ -49,7 +49,7 @@ The workflow is designed to be fully autonomous once the **"Active"** toggle is 
 ### Email Classification Logic
 The classifier ensures the AI doesn't waste resources on newsletters. We define specific categories for the model to distinguish between promotional content and actual service requests:
 
-```json
+```
 // Internal configuration for the Text Classifier
 categories: [
     {
